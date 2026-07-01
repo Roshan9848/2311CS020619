@@ -6,32 +6,25 @@ import { log } from "../../../logging-middleware/logger";
 
 const TYPE_CONFIGS = {
   Placement: {
-    bg: "#e0e7ff", // Indigo 100
-    text: "#4338ca", // Indigo 700
+    bg: "#e0e7ff",
+    text: "#4338ca",
     label: "Placement",
     icon: <PlacementIcon sx={{ fontSize: 14, color: "#4338ca" }} />
   },
   Result: {
-    bg: "#ffedd5", // Orange 100
-    text: "#c2410c", // Orange 700
+    bg: "#ffedd5",
+    text: "#c2410c",
     label: "Result",
     icon: <ResultIcon sx={{ fontSize: 14, color: "#c2410c" }} />
   },
   Event: {
-    bg: "#dcfce7", // Green 100
-    text: "#15803d", // Green 700
+    bg: "#dcfce7",
+    text: "#15803d",
     label: "Event",
     icon: <EventIcon sx={{ fontSize: 14, color: "#15803d" }} />
   }
 };
 
-/**
- * Renders a single notification card.
- * @param {object} props
- * @param {object} props.notification - The notification data
- * @param {boolean} props.isUnread - Unread state
- * @param {function} props.onView - Callback when notification is clicked/viewed
- */
 export function NotificationCard({ notification, isUnread, onView }) {
   const { ID, Type, Message, Timestamp } = notification;
   const config = TYPE_CONFIGS[Type] || {
@@ -41,7 +34,6 @@ export function NotificationCard({ notification, isUnread, onView }) {
     icon: null
   };
 
-  // Format date cleanly
   const formattedDate = new Date(Timestamp).toLocaleString("en-US", {
     month: "short",
     day: "numeric",
@@ -49,7 +41,6 @@ export function NotificationCard({ notification, isUnread, onView }) {
     minute: "2-digit"
   });
 
-  // Mark as read on click
   const handleClick = async () => {
     if (isUnread && onView) {
       onView(ID);
@@ -74,7 +65,6 @@ export function NotificationCard({ notification, isUnread, onView }) {
         }
       }}
     >
-      {/* Unread indicator dot */}
       {isUnread && (
         <Box
           sx={{

@@ -2,15 +2,8 @@ import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 const filters = ["All", "Placement", "Result", "Event"];
 
-/**
- * Filter component for selecting the notification category.
- * @param {object} props
- * @param {string} props.value - Selected filter
- * @param {function} props.onChange - Selection handler
- */
 export function NotificationFilter({ value, onChange }) {
   const handleChange = (event, newFilter) => {
-    // Prevent deselecting (MUI exclusive group returns null if clicking active item)
     if (newFilter !== null && onChange) {
       onChange(newFilter);
     }
