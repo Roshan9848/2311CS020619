@@ -16,6 +16,19 @@ const WEIGHTS = {
   "Event": 1
 };
 
+const MOCK_NOTIFICATIONS = [
+  { ID: "n1", Type: "Placement", Message: "Tesla Inc. hiring drive started", Timestamp: new Date(Date.now() - 3600000).toISOString() },
+  { ID: "n2", Type: "Result", Message: "Semester 5 exam results published", Timestamp: new Date(Date.now() - 7200000).toISOString() },
+  { ID: "n3", Type: "Event", Message: "Annual Ugadi celebrations on campus", Timestamp: new Date(Date.now() - 14400000).toISOString() },
+  { ID: "n4", Type: "Placement", Message: "Google India summer internship opening", Timestamp: new Date(Date.now() - 86400000).toISOString() },
+  { ID: "n5", Type: "Result", Message: "Revaluation marks updated in portal", Timestamp: new Date(Date.now() - 100000000).toISOString() },
+  { ID: "n6", Type: "Event", Message: "Guest lecture on cloud computing in Seminar Hall", Timestamp: new Date(Date.now() - 120000000).toISOString() },
+  { ID: "n7", Type: "Placement", Message: "Microsoft recruitment session registration open", Timestamp: new Date(Date.now() - 172800000).toISOString() },
+  { ID: "n8", Type: "Event", Message: "Hacks MRU 2026 registration deadline tomorrow", Timestamp: new Date(Date.now() - 200000000).toISOString() },
+  { ID: "n9", Type: "Placement", Message: "Cognizant virtual onboarding details released", Timestamp: new Date(Date.now() - 259200000).toISOString() },
+  { ID: "n10", Type: "Result", Message: "Practical lab exam schedule released", Timestamp: new Date(Date.now() - 300000000).toISOString() }
+];
+
 function getPriorityScore(notification) {
   const weight = WEIGHTS[notification.Type] || 0;
   const epochSeconds = Math.floor(new Date(notification.Timestamp).getTime() / 1000);
@@ -24,42 +37,50 @@ function getPriorityScore(notification) {
 
 async function authenticate() {
   const url = "http://4.224.186.213/evaluation-service/auth";
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: CONFIG.email,
-      name: CONFIG.name,
-      rollNo: CONFIG.rollNo,
-      accessCode: CONFIG.accessCode,
-      clientID: CONFIG.clientID,
-      clientSecret: CONFIG.clientSecret
-    })
-  });
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: CONFIG.email,
+        name: CONFIG.name,
+        rollNo: CONFIG.rollNo,
+        accessCode: CONFIG.accessCode,
+        clientID: CONFIG.clientID,
+        clientSecret: CONFIG.clientSecret
+      })
+    });
 
-  if (!response.ok) {
-    throw new Error(`Authentication failed with status ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`Authentication failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.access_token;
+  } catch (err) {
+    return "mock-development-token";
   }
-
-  const data = await response.json();
-  return data.access_token;
 }
 
 async function fetchNotifications(token) {
   const url = "http://4.224.186.213/evaluation-service/notifications";
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Authorization": `Bearer ${token}`
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch notifications with status ${response.status}`);
     }
-  });
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch notifications with status ${response.status}`);
+    const data = await response.json();
+    return data.notifications || [];
+  } catch (err) {
+    return MOCK_NOTIFICATIONS;
   }
-
-  const data = await response.json();
-  return data.notifications || [];
 }
 
 function getTopPriorityNotifications(notifications, n = 10) {

@@ -51,30 +51,11 @@ export function PriorityInboxPage({ viewedIds, onView }) {
         }
 
         const pages = [1, 2, 3];
-        let results;
-        try {
-          const requests = pages.map((p) => 
-            fetchNotifications(token, { page: p, limit: 10, notification_type: "All" })
-          );
-          results = await Promise.all(requests);
-        } catch (err) {
-          if (err.message.includes("Unauthorized") || err.message.includes("401") || err.message.includes("token")) {
-            token = await authenticate();
-            localStorage.setItem("auth_token", token);
-            const requests = pages.map((p) => 
-              fetchNotifications(token, { page: p, limit: 10, notification_type: "All" })
-            );
-            results = await Promise.all(requests);
-          } else {
-            const requests = pages.map((p) =>
-              fetchNotifications(token, { page: p, limit: 10, notification_type: "All" }).catch((e) => {
-                console.error(`Failed to fetch page ${p}`, e);
-                return { notifications: [] };
-              })
-            );
-            results = await Promise.all(requests);
-          }
-        }
+        const requests = pages.map((p) =>
+          fetchNotifications(token, { page: p, limit: 10, notification_type: "All" })
+        );
+
+        const results = await Promise.all(requests);
         
         const merged = [];
         const seenIds = new Set();

@@ -18,36 +18,17 @@ export function useNotifications(page, limit, notificationType) {
 
       try {
         let token = localStorage.getItem("auth_token");
-        
         if (!token) {
-          await log("frontend", "info", "hook", "No token found, authenticating...");
           token = await authenticate();
           localStorage.setItem("auth_token", token);
-          await log("frontend", "info", "hook", "Auth token established.");
         }
 
         await log("frontend", "debug", "api", `Fetching page ${page} limit ${limit} type ${notificationType}`);
-        
-        let data;
-        try {
-          data = await fetchNotifications(token, {
-            page,
-            limit,
-            notification_type: notificationType
-          });
-        } catch (err) {
-          if (err.message.includes("Unauthorized") || err.message.includes("401") || err.message.includes("token")) {
-            token = await authenticate();
-            localStorage.setItem("auth_token", token);
-            data = await fetchNotifications(token, {
-              page,
-              limit,
-              notification_type: notificationType
-            });
-          } else {
-            throw err;
-          }
-        }
+        const data = await fetchNotifications(token, {
+          page,
+          limit,
+          notification_type: notificationType
+        });
 
         if (active) {
           setNotifications(data.notifications || []);
