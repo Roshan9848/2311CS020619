@@ -27,11 +27,27 @@ export function useNotifications(page, limit, notificationType) {
         }
 
         await log("frontend", "debug", "api", `Fetching page ${page} limit ${limit} type ${notificationType}`);
-        const data = await fetchNotifications(token, {
-          page,
-          limit,
-          notification_type: notificationType
-        });
+        
+        let data;
+        try {
+          data = await fetchNotifications(token, {
+            page,
+            limit,
+            notification_type: notificationType
+          });
+        } catch (err) {
+          if (err.message.includes("Unauthorized") || err.message.includes("401") || err.message.includes("token")) {
+            token = await authenticate();
+            localStorage.setItem("auth_token", token);
+            data = await fetchNotifications(token, {
+              page,
+              limit,
+              notification_type: notificationType
+            });
+          } else {
+            throw err;
+          }
+        }
 
         if (active) {
           setNotifications(data.notifications || []);
