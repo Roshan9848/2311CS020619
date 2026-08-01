@@ -49,7 +49,7 @@ export function PriorityInboxPage({ viewedIds, onView }) {
           token = await authenticate();
           localStorage.setItem("auth_token", token);
         }
-
+//B
         const pages = [1, 2, 3];
         const requests = pages.map((p) =>
           fetchNotifications(token, { page: p, limit: 10, notification_type: "All" })
